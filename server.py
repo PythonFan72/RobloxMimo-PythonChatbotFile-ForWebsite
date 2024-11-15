@@ -10,6 +10,10 @@ model_path = "fine_tuned_model"  # Path to your fine-tuned model folder
 model = GPT2LMHeadModel.from_pretrained(model_path)
 tokenizer = GPT2Tokenizer.from_pretrained(model_path)
 
+# Set the pad token id to be the same as the eos_token_id (for GPT-2)
+tokenizer.pad_token = tokenizer.eos_token
+model.config.pad_token_id = model.config.eos_token_id
+
 @app.route('/generate', methods=['POST'])
 def generate():
     try:
@@ -20,6 +24,7 @@ def generate():
 
         # Generate text using the model
         inputs = tokenizer.encode(prompt, return_tensors="pt")
+        attention_mask = torch.ones(inputs.shape, device=inputs.device) 
         outputs = model.generate(inputs, max_length=max_length, num_return_sequences=1)
 
         # Decode and send the generated text
