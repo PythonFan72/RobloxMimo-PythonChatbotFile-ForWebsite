@@ -36,7 +36,7 @@ def generate():
         attention_mask = torch.ones(inputs.shape, device=inputs.device)  # All tokens are real initially
         
         # Generate the output with attention mask
-        outputs = model.generate(inputs, max_length=50, num_return_sequences=1, attention_mask=attention_mask)
+        outputs = model.generate(inputs, max_length=200, num_return_sequences=1, attention_mask=attention_mask)
 
         # Decode and send the generated text
         generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
