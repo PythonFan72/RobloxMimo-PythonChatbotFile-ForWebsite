@@ -17,23 +17,28 @@ model.config.pad_token_id = model.config.eos_token_id
 @app.route('/generate', methods=['POST'])
 def generate():
     try:
+        passwordTime = 1
         # Parse the request data
         data = request.json
         prompt = data.get("prompt", "")
         max_length = data.get("max_length", 50)
+        password = data.get("password", "")
 
-        # Generate text using the model
-        inputs = tokenizer.encode(prompt, return_tensors="pt")
-        
-        # Create attention mask (1 for real tokens, 0 for padding)
-        attention_mask = torch.ones(inputs.shape, device=inputs.device)  # All tokens are real initially
-        
-        # Generate the output with attention mask
-        outputs = model.generate(inputs, max_length=max_length, num_return_sequences=1, attention_mask=attention_mask)
+        if password==passwordTime:
 
-        # Decode and send the generated text
-        generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return jsonify({"generated_text": generated_text})
+            # Generate text using the model
+            inputs = tokenizer.encode(prompt, return_tensors="pt")
+        
+            # Create attention mask (1 for real tokens, 0 for padding)
+            attention_mask = torch.ones(inputs.shape, device=inputs.device)  # All tokens are real initially
+        
+            # Generate the output with attention mask
+            outputs = model.generate(inputs, max_length=max_length, num_return_sequences=1, attention_mask=attention_mask)
+
+            # Decode and send the generated text
+            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+            return jsonify({"generated_text": generated_text})
+            
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
