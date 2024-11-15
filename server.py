@@ -14,33 +14,37 @@ tokenizer = GPT2Tokenizer.from_pretrained(model_path)
 tokenizer.pad_token = tokenizer.eos_token
 model.config.pad_token_id = model.config.eos_token_id
 
+# Store password securely as an environment variable (set it in your server environment)
+PASSWORD = os.getenv('PASSWORD', 'default_password')  # Default password for testing
+
 @app.route('/generate', methods=['POST'])
 def generate():
     try:
-        passwordTime = 1
         # Parse the request data
         data = request.json
         prompt = data.get("prompt", "")
-        max_length = data.get("max_length", 50)
         password = data.get("password", "")
 
-        if password==passwordTime:
+        # Check the password
+        if password != PASSWORD:
+            return jsonify({"error": "Unauthorized access: Incorrect password"}), 403
 
-            # Generate text using the model
-            inputs = tokenizer.encode(prompt, return_tensors="pt")
+        # Generate text using the model
+        inputs = tokenizer.encode(prompt, return_tensors="pt")
         
-            # Create attention mask (1 for real tokens, 0 for padding)
-            attention_mask = torch.ones(inputs.shape, device=inputs.device)  # All tokens are real initially
+        # Create attention mask (1 for real tokens, 0 for padding)
+        attention_mask = torch.ones(inputs.shape, device=inputs.device)  # All tokens are real initially
         
-            # Generate the output with attention mask
-            outputs = model.generate(inputs, max_length=max_length, num_return_sequences=1, attention_mask=attention_mask)
+        # Generate the output with attention mask
+        outputs = model.generate(inputs, max_length=50, num_return_sequences=1, attention_mask=attention_mask)
 
-            # Decode and send the generated text
-            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-            return jsonify({"generated_text": generated_text})
-            
+        # Decode and send the generated text
+        generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return jsonify({"generated_text": generated_text})
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+
