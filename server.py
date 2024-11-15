@@ -15,7 +15,7 @@ tokenizer.pad_token = tokenizer.eos_token
 model.config.pad_token_id = model.config.eos_token_id
 
 # Store password securely as an environment variable (set it in your server environment)
-PASSWORD = os.getenv('PASSWORD', 'default_password')  # Default password for testing
+PASSWORD = os.getenv('PASSWORD', 'ThisIsAPassword!!')  # Default password for testing
 
 @app.route('/generate', methods=['POST'])
 def generate():
