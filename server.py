@@ -20,7 +20,7 @@ def generate():
         # Parse the request data
         data = request.json
         prompt = data.get("prompt", "")
-        max_length = data.get("max_length", 50)
+        max_length = data.get("max_length", 200)
 
         # Generate text using the model
         inputs = tokenizer.encode(prompt, return_tensors="pt")
